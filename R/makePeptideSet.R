@@ -24,6 +24,8 @@
 #' BG correction.
 #' @param check.row.order A \code{logical}. Should slides be reduced to a common
 #' set of peptides?
+#' @param columns A list with entries \emph{F} and \emph{B} indicating the columns
+#' containing forground and background intensities to use.
 #' @param verbose A \code{logical}. Displays progress and additional information.
 #'
 #' @details
@@ -82,6 +84,7 @@
 makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=FALSE,
                          rm.control.list=NULL, empty.control.list=NULL,
                          bgCorrect.method="normexp", log=TRUE, check.row.order=FALSE,
+                         columns=list(F="F635 Median", B="B635 Median"),
                          verbose=FALSE){
   # There is some ambiguity with respect to what is Name and ID
   # ID -> peptide
@@ -98,12 +101,12 @@ makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=FAL
   if (!check.row.order) { # Assume that the design is the same and don't check rows, order, etc.
     RG <- read.maimages(files=files,
                         source="genepix", path=path, ext="gpr",
-                        columns=list(R="F635 Median",Rb="B635 Median"),
+                        columns=list(R=columns$F,Rb=columns$B),
                         wt.fun=f,verbose=verbose)
   } else { # Used if the arrays don't exactly contain the same feature (e.g. the design has changed)
     files <- grep("gpr",list.files(path),value=TRUE)
     RG.list <- lapply(files, read.maimages, source="genepix",
-                      path=path, columns=list(R="F635 Median",Rb="B635 Median"),
+                      path=path, columns=list(R=columns$F,Rb=columns$B),
                       wt.fun=f, verbose=verbose)
     if(verbose){
       cat("Reordering all peptides\n")
